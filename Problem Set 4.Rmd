@@ -1,0 +1,72 @@
+---
+title: "PS4"
+author: "Zariah Tolman"
+date: "2022-11-18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(dplyr)
+library(ggplot2)
+library(ggpubr)
+library(tidyverse)
+library(effectsize)
+library(tidyr)
+library(rstatix)
+
+po <- read.csv("Survey Data.csv")
+po$Type <- as.factor(po$Type)
+po$Gender <- as.factor(po$Gender)
+po <- rename(po,
+             DERS = Pre.DERS,
+             Strategies = Pre.Strategies,
+             Non.Acceptance = Pre.Non.acceptance,
+             Impulse.Control = Pre.Impulse,
+             Goals = Pre.Goals,
+             Awareness = Pre.Awareness,
+             Clarity = Pre.Clarity,
+             IERQ = Pre.IERQ,
+             Enhancing.PA = Pre.enhancing.positive.affect,
+             Perspective.Taking = Pre.perspective.taking,
+             Soothing = Pre.soothing,
+             Social.Modeling = Pre.social.modeling,
+             Resilience = Pre.Resilience,
+             Anxiety.Depression = Pre.PHQ.4,
+             Anxiety = Pre.Anxiety,
+             Depression = Pre.Depression
+)
+
+```
+
+## ANOVA
+Does the DERS depend on participant type and gender? 
+
+```{r ANOVA}
+model1 <- aov(DERS~Type*Gender,data=po)
+
+summary(model1)
+confint(model1)
+partial_eta_squared(model1)
+
+```
+```{r simple effects}
+#effect of gender on DERS for mentors 
+simpEff1 <- po %>% filter(Type=="Mentor") %>% 
+  aov(DERS~Gender,data=.) 
+confint(simpEff1)
+
+summary(simpEff1)
+TukeyHSD(simpEff1)
+partial_eta_squared(simpEff1)
+
+#effect of gender on DERS for mentees 
+simpEff2 <- po %>% filter(Type=="Mentee") %>% 
+  aov(DERS~Gender,data=.) 
+
+summary(simpEff2)
+confint(simpEff2)
+partial_eta_squared(simpEff2)
+```
+
